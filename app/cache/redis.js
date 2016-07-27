@@ -9,7 +9,7 @@ var client = require('../client');
 
 module.exports = {
   
-  get: function(url, path, queryStr, callback) {
+  get: function(url, path, queryStr, customCacheTTL, callback) {
     
     rClient.on("error", function (err) {
       console.log("Error " + err);
@@ -20,7 +20,8 @@ module.exports = {
         console.log('call client');
         client.call(path, queryStr, function (err, value) {
           rClient.set(url, JSON.stringify(value), callback(err, value));
-          rClient.expire(url, config.ttl);
+          var ttl = customCacheTTL && customCacheTTL > 0 ? customCacheTTL : config.ttl;
+          rClient.expire(url, ttl);
         });
       } else {
         console.log('found in redis cache');

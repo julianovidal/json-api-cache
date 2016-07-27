@@ -7,6 +7,7 @@ var cache = config.type == 'redis' ? require('../cache/redis') : require('../cac
 module.exports = function(app) {
   
   app.get(config.contextRoot, function (req, res) {
+
     var url = req.url;
     var path = req.path;
     var queryStr = req.query;
@@ -17,7 +18,9 @@ module.exports = function(app) {
       url = url.replace(config.ordParam.value + '=' + ordParamVal, '');
     }
 
-    cache.get(url, path, queryStr, function (error, result) {
+    var customCacheTTL = getCustomCacheTTL(req.headers);
+
+    cache.get(url, path, queryStr, customCacheTTL, function (error, result) {
       if(error) {
         console.log(error);
       }
@@ -27,3 +30,19 @@ module.exports = function(app) {
   });
 
 };
+
+var getCustomCacheTTL = function (requestHeaders) {
+  if( requestHeaders['cache-control'] && requestHeaders['cache-control'] != 'max-age=0' && requestHeaders['cache-control'] != 'no-cache') {
+    if(requestHeaders['cache-control'].indexOf('max-age=') == 0) {
+      var ttl = requestHeaders['cache-control'].replace('max-age=', '');
+      try {
+        ttl = parseInt(ttl);
+        return ttl;
+      } catch (err) {
+        console.log('Error while parsing custom ttl for header ' + requestHeaders);
+        return -1;
+      }
+    }
+  }
+  return -1;
+}

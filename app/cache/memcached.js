@@ -9,7 +9,7 @@ var client = require('../client');
 
 module.exports = {
   
-  get: function(url, path, queryStr, callback) {
+  get: function(url, path, queryStr, customCacheTTL, callback) {
 
     memcached.on("failure", function (err) {
       console.log("Error " + err);
@@ -21,7 +21,8 @@ module.exports = {
         client.call(path, queryStr, function (err, newvalue) {
       
           if(newvalue != undefined) {
-            memcached.set(url, newvalue, config.ttl, function (err, value) {
+            var ttl = customCacheTTL && customCacheTTL > 0 ? customCacheTTL : config.ttl;
+            memcached.set(url, newvalue, ttl, function (err, value) {
               callback(err, newvalue);
             });  
           } else {
