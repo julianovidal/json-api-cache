@@ -14,7 +14,11 @@ module.exports =  {
         host: '127.0.0.1',
         port: 11211      
       },
-      contextRoot: '/*'
+      contextRoot: '/*',
+      ordParam: { 
+        value: 'rand', 
+        removeIfPresent: true 
+      }
     };
     
     switch (env) {
