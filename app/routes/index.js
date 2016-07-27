@@ -6,7 +6,7 @@ var cache = config.type == 'redis' ? require('../cache/redis') : require('../cac
 
 module.exports = function(app) {
   
-  app.get('*', function (req, res) {
+  app.get(config.contextRoot, function (req, res) {
     var url = req.url;
     var path = req.path;
     var queryStr = req.query;
