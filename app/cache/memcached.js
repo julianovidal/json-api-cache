@@ -20,9 +20,15 @@ module.exports = {
         console.log('call client');
         client.call(path, queryStr, function (err, newvalue) {
       
-          memcached.set(url, newvalue, config.ttl, function (err, value) {
-            callback(err, newvalue);
-          });
+          if(newvalue != undefined) {
+            memcached.set(url, newvalue, config.ttl, function (err, value) {
+              callback(err, newvalue);
+            });  
+          } else {
+            console.log('Error while trying to store value: ' + newvalue + ' on memcached.');
+            callback(new Error('Error while trying to store value: ' + newvalue + ' on memcached.'), null);
+          }
+          
 
         });
       } else {
